@@ -20,3 +20,11 @@
 **Interview answer**
 - Q: How did you keep your API key out of the repo?
 - A: First we create a .gitignore file. Then I create a .env file and mention this in the .gitignore file so that it does not get uploaded to the repo. The lives in the .env file and the code reads it at runtime as an environment variable, so the key is never mentioned in the source code. This ensures that the API key is never commited because anything commited stays in the git history. Then I commit a .env.example file with placeholders so others know which variable to set.To verify, I check git status before committing and a secret scanner can audit the full git history. If a key ever leaked, I'd revoke it with the provider immediately. Rewriting history doesn’t make a leaked key safe again. 
+
+## Wed 4 Nov 2026: Discovery (interviews)
+
+**Decisions (and why)**
+- Build and tune on the 500 development tickets, test on the 80 validation tickets. Never adjust the system based on the 80. Otherwise the score is memorised, not earned.
+
+**Finding**
+- Interviews are claims, not facts. Check them against the data. Some claims can't be checked with the data we have (e.g. first-reply time isn't in the tickets).
