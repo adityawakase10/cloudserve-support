@@ -4,7 +4,7 @@
 
 **Concepts**
 - venv: a private copy of Python inside the project. Packages install only there. `(.venv)` in the prompt means it's active.
-- PATH: Windows runs the first python.exe it finds. Always check with `sys.executable`.
+- PATH: Windows runs the first python.exe it finds in the PATH folder list. Always check with `sys.executable`.
 
 **Decisions (and why)**
 - Python 3.13: mature enough that the packages have builds for it; not the 3.9 Anaconda.
