@@ -1,0 +1,13 @@
+# Top-level dependencies. After a successful install on the build machine this file is
+# replaced by exact pins with:  python -m pip freeze > requirements.txt
+python-dotenv
+requests
+numpy
+pandas
+scikit-learn
+sentence-transformers
+chromadb
+fastapi
+uvicorn
+prometheus-client
+pytest
