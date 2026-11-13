@@ -53,13 +53,16 @@ class Settings:
     relevance_threshold: float = field(default_factory=lambda: float(os.getenv("RELEVANCE_THRESHOLD", "0.35")))
     # Intent confidence below this always escalates.
     confidence_threshold: float = field(default_factory=lambda: float(os.getenv("CONFIDENCE_THRESHOLD", "0.50")))
+    # Probability (from the answerability classifier) that the docs can solve THIS
+    # specific ticket. Below this, escalate even if a related article was found.
+    answerable_threshold: float = field(default_factory=lambda: float(os.getenv("ANSWERABLE_THRESHOLD", "0.50")))
     # Share of an answer's words that must appear in the cited passages.
     grounding_min_overlap: float = field(default_factory=lambda: float(os.getenv("GROUNDING_MIN_OVERLAP", "0.5")))
 
     # --- Governance ---------------------------------------------------------
     # Kill switch: when false, nothing is sent automatically; everything escalates.
     auto_respond_enabled: bool = field(default_factory=lambda: _bool("AUTO_RESPOND_ENABLED", True))
-    prompt_version: str = "PR-01 v1.0"
+    prompt_version: str = "PR-01 v1.1"
 
     @property
     def db_path(self) -> Path:
@@ -71,10 +74,12 @@ class Settings:
         return self.storage_dir / "KILL_SWITCH"
 
 
-# Intents that must never be answered automatically (security, compliance,
-# no documentation exists). Source: labels.must_not_auto_respond in the
-# development data, plus Daniel's and Ines's interviews.
-NEVER_AUTO_INTENTS = {"security_incident", "compliance_request", "feature_request", "unclear_request"}
+# Intents that must never be answered automatically. Source: labels.must_not_auto_respond
+# in the development data (security, compliance, feature requests, unclear requests),
+# PLUS data_residency because Daniel (tier 2) said data-location questions carry
+# compliance risk and must always reach a human, even though the labels allow it.
+NEVER_AUTO_INTENTS = {"security_incident", "compliance_request", "feature_request", "unclear_request",
+                      "data_residency"}
 
 
 def get_settings() -> Settings:

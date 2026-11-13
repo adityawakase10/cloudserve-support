@@ -17,11 +17,14 @@ FALLBACK_INTENT = "unclear_request"
 
 
 class TicketClassifier:
-    def __init__(self, embedder, train_texts, intents, urgencies, c: float = 10.0):
+    def __init__(self, embedder, train_texts, intents, urgencies, answerable, c: float = 10.0):
         self.embedder = embedder
         X = embedder.encode(train_texts)
         self.intent_model = LogisticRegression(C=c, max_iter=3000).fit(X, intents)
         self.urgency_model = LogisticRegression(C=c, max_iter=3000).fit(X, urgencies)
+        # Second question, separate from the topic: can the documentation actually
+        # solve THIS ticket? Learned from labels.answerable_from_docs.
+        self.answerable_model = LogisticRegression(C=c, max_iter=3000).fit(X, answerable)
 
     def classify(self, text: str) -> Classification:
         """Never raises: returns a defined fallback when it cannot classify."""
@@ -33,6 +36,8 @@ class TicketClassifier:
             up = self.urgency_model.predict_proba(x)[0]
             order = np.argsort(-ip)
             best_u = int(np.argmax(up))
+            ans_col = list(self.answerable_model.classes_).index(True)
+            answerable_prob = float(self.answerable_model.predict_proba(x)[0][ans_col])
             return Classification(
                 intent=str(self.intent_model.classes_[order[0]]),
                 intent_confidence=round(float(ip[order[0]]), 4),
@@ -40,6 +45,7 @@ class TicketClassifier:
                 urgency_confidence=round(float(up[best_u]), 4),
                 alternatives=[{"value": str(self.intent_model.classes_[i]),
                                "confidence": round(float(ip[i]), 4)} for i in order[1:4]],
+                answerable_prob=round(answerable_prob, 4),
             )
         except Exception as exc:  # defined fallback instead of crashing
             return Classification(intent=FALLBACK_INTENT, intent_confidence=0.0,

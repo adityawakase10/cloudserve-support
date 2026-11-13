@@ -19,12 +19,16 @@ def pre_generation_route(ticket, classification, passages, settings, kill_switch
         return "escalate", "No confidence score was produced; a missing score is never treated as a high one."
     if classification.intent in NEVER_AUTO_INTENTS:
         return "escalate", (f"Topic '{classification.intent}' is on the never-automate list "
-                            "(security, compliance, feature requests, unclear requests).")
+                            "(security, compliance, data location, feature requests, unclear requests).")
     if classification.intent_confidence < settings.confidence_threshold:
         alt = ", ".join(a["value"] for a in classification.alternatives[:2])
         return "escalate", (f"Not confident about the topic ({classification.intent_confidence:.0%} for "
                             f"'{classification.intent}', below the {settings.confidence_threshold:.0%} bar). "
                             f"Other possibilities: {alt}.")
+    if classification.answerable_prob < settings.answerable_threshold:
+        return "escalate", (f"The documentation covers this topic, but this particular situation looks like it "
+                            f"needs a person ({classification.answerable_prob:.0%} chance the docs solve it, "
+                            f"below the {settings.answerable_threshold:.0%} bar).")
     if not passages:
         return "escalate", ("No documentation passage was relevant enough to ground an answer, "
                             "so the system will not guess.")
@@ -38,7 +42,8 @@ def escalation_summary(ticket, classification, passages, reason: str) -> str:
              f"Why escalated: {reason}"]
     if classification:
         lines.append(f"Likely topic: {classification.intent} ({classification.intent_confidence:.0%}); "
-                     f"urgency: {classification.urgency}.")
+                     f"urgency: {classification.urgency}; "
+                     f"chance docs solve it: {classification.answerable_prob:.0%}.")
         if classification.alternatives:
             lines.append("Also possible: " + ", ".join(
                 f"{a['value']} ({a['confidence']:.0%})" for a in classification.alternatives if "value" in a))

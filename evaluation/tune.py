@@ -84,6 +84,19 @@ def main():
         m = eligible & (probs >= th)
         acc = 100 * correct[m].mean() if m.sum() else float("nan")
         print(f"   {th:>9.1f} | {100*m.mean():>27.1f}% | {acc:>22.1f}%")
+    # ----------------------------------------- 4. answerability threshold
+    ans_prob = np.zeros(len(texts))
+    for tr, te in GroupKFold(n_splits=5).split(X, intents, [group_ids[g] for g in groups]):
+        model = LogisticRegression(C=10.0, max_iter=3000).fit(X[tr], answerable[tr])
+        ans_prob[te] = model.predict_proba(X[te])[:, list(model.classes_).index(True)]
+    route_ok = np.array([t.labels.get("expected_route") == "auto_respond" for t in train])
+    print("\n4. ANSWERABILITY THRESHOLD (on top of the never-automate list and threshold 3)")
+    print("   threshold | auto-answered share | of those, experts agree auto | wrongly auto-answered")
+    base = eligible & (probs >= s.confidence_threshold)
+    for th in [0.3, 0.4, 0.5, 0.6, 0.7, 0.8]:
+        m = base & (ans_prob >= th)
+        agree = 100 * route_ok[m].mean() if m.sum() else float("nan")
+        print(f"   {th:>9.1f} | {100*m.mean():>18.1f}% | {agree:>27.1f}% | {int((m & ~route_ok).sum()):>4} of {len(texts)}")
     print("\nPick: the chunking + relevance threshold with a high hit rate AND low wrong-retrieval,")
     print("and the lowest confidence threshold whose topic accuracy is at least 85% (Brief target).")
 

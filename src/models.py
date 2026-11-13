@@ -33,6 +33,7 @@ class Classification:
     urgency: str
     urgency_confidence: float
     alternatives: list        # [{"value": ..., "confidence": ...}] for the next best intents
+    answerable_prob: float = 0.0   # chance the docs can solve this specific ticket
 
 
 @dataclass

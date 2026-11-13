@@ -71,3 +71,20 @@ def test_harness_full_run_reconciles(tmp_storage):
     assert metrics["governance"]["reconciles_with_tickets"]
     assert (out_dir / "metrics_report.md").exists()
     assert len((out_dir / "results.jsonl").read_text().strip().splitlines()) == len(tickets)
+
+
+def test_data_location_question_never_auto_answered(pipeline):
+    """Daniel: data-location questions carry compliance risk and must reach a human."""
+    _, out = pipeline.process(make_ticket(subject="Need data to stay in the EU",
+                                          body="We need our data to remain within the EU for a contract. "
+                                               "Can you confirm which region our backups are stored in?"))
+    assert out.action != "auto_respond"
+
+
+def test_low_answerability_escalates(pipeline):
+    from src.models import Classification
+    from src.route import pre_generation_route
+    from src.ingest import normalise
+    c = Classification("billing_query", 0.95, "medium", 0.9, [], answerable_prob=0.1)
+    decision, reason = pre_generation_route(normalise(make_ticket()), c, ["passage"], pipeline.s, False)
+    assert decision == "escalate" and "needs a person" in reason

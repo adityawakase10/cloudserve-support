@@ -44,7 +44,8 @@ class SupportPipeline:
         self.retriever = Retriever(self.s, self.embedder, passages)
         self.classifier = TicketClassifier(self.embedder, [t.text for t in train],
                                            [t.labels["intent"] for t in train],
-                                           [t.labels.get("urgency", "medium") for t in train])
+                                           [t.labels.get("urgency", "medium") for t in train],
+                                           [bool(t.labels.get("answerable_from_docs")) for t in train])
         self.generator = Generator(self.s)
         self.log = DecisionLog(self.s.db_path, run_id)
         self.model_label = (self.s.model_name if self.s.llm_provider != "offline" else "offline-extractive")
@@ -81,7 +82,7 @@ class SupportPipeline:
 
         # 2. Classify (no model call)
         c = self.classifier.classify(ticket.text)
-        log.record(tid, "classification", "classified", f"intent={c.intent}, urgency={c.urgency}",
+        log.record(tid, "classification", "classified", f"intent={c.intent}, urgency={c.urgency}, answerable_prob={c.answerable_prob}",
                    input_summary=summary, model=f"logreg+{self.embedder.name}", prediction=c.intent,
                    confidence=c.intent_confidence, alternatives=c.alternatives,
                    requirement_ids=REQ["classification"])
