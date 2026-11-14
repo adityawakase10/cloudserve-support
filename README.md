@@ -42,7 +42,16 @@ python -m pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Then open `.env` and replace `your_key_here` with your Groq key.
+Then open `.env`, replace `your_key_here` with your Groq key, and save. To check the key is set
+without printing it (should show `gsk_` and a length of about 56):
+```
+python -c "from dotenv import dotenv_values; k=dotenv_values('.env').get('GROQ_API_KEY',''); print(k[:4], len(k))"
+```
+If every ticket is escalated with "the model provider was unavailable", the key is missing or wrong.
+
+**In every new terminal, activate the virtual environment first** (`.venv\Scripts\Activate.ps1` on
+Windows, `source .venv/bin/activate` on macOS/Linux). The prompt should start with `(.venv)`;
+without it you will see `ModuleNotFoundError`.
 
 ## Run
 
