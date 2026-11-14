@@ -57,6 +57,15 @@ Point `--input` at any ticket file with the same schema. Outputs in the `--outpu
 `metrics.json`, `decisions.csv`. The full decision log is also in `storage/decisions.db`.
 Add `--limit 5` for a quick check.
 
+**Failure-handling demo:** a prompt injection, an empty ticket, a security incident, garbled
+characters on an unknown channel, a duplicate ID and a record that is not a ticket:
+```
+python -m evaluation.harness --input data/demo_failure_tickets.json --output evaluation/results/demo
+```
+To see the provider-outage path, set `GROQ_API_KEY=invalid` and `LLM_CACHE_ENABLED=false` in `.env`
+(or disconnect from the internet) and run the main command with `--limit 8`: tickets that would have been
+answered are escalated with context instead, and nothing crashes. Restore both settings afterwards.
+
 **Tests** (offline, no key needed):
 ```
 python -m pytest tests/ -v

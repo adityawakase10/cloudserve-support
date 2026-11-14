@@ -59,7 +59,7 @@ class LLMClient:
     def complete(self, messages, expected_tokens: int = 2000) -> dict:
         """Returns {"content": str, "tokens": int, "cached": bool}. Raises ProviderError."""
         key = self._key(messages)
-        cached = self._cache_get(key)
+        cached = self._cache_get(key) if self.s.llm_cache_enabled else None
         if cached:
             return {**cached, "cached": True, "tokens": 0}
 

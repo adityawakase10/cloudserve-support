@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "run_id": "run-20261114T135252Z",
+    "input": "data/demo_failure_tickets.json",
+    "started": "2026-11-14T13:52:52.355318+00:00",
+    "duration_s": 48.0,
+    "model": "openai/gpt-oss-20b",
+    "settings": {
+      "embedding_backend": "sentence-transformers",
+      "vector_backend": "chroma",
+      "chunk_strategy": "whole",
+      "retrieval_top_k": 3,
+      "relevance_threshold": 0.4,
+      "confidence_threshold": 0.5,
+      "grounding_min_overlap": 0.5,
+      "prompt_version": "PR-01 v1.1"
+    }
+  },
+  "metrics": {
+    "volume": {
+      "tickets_processed": 6,
+      "answered_automatically": 0,
+      "escalated": 5,
+      "blocked_by_guardrails": 1,
+      "by_channel": {
+        "email": 1,
+        "chat": 1,
+        "forum": 1,
+        "unknown": 2,
+        "docs_comment": 1
+      }
+    },
+    "business": {
+      "first_contact_resolution_pct": 0.0,
+      "escalation_rate_pct": 100.0,
+      "time_to_first_reply_auto_s": {
+        "mean": null,
+        "median": null
+      },
+      "time_to_handoff_all_s": {
+        "mean": 0.17,
+        "median": 0.12
+      }
+    },
+    "technical": {
+      "latency_s": {
+        "median": 0.119,
+        "p95": 0.434
+      },
+      "tokens_used_total": 0
+    },
+    "governance": {
+      "decisions_logged_final": 6,
+      "decision_rows_all_stages": 22,
+      "reconciles_with_tickets": true,
+      "guardrail_activations": {
+        "instruction_integrity": 1
+      },
+      "private_data_detections": 0
+    }
+  }
+}

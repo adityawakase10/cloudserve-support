@@ -32,6 +32,8 @@ class Settings:
         "LLM_BASE_URL", "https://api.groq.com/openai/v1/chat/completions"))
     llm_timeout_s: float = field(default_factory=lambda: float(os.getenv("LLM_TIMEOUT_S", "30")))
     llm_max_retries: int = field(default_factory=lambda: int(os.getenv("LLM_MAX_RETRIES", "4")))
+    # Cache model replies on disk (turn off to demonstrate an outage honestly).
+    llm_cache_enabled: bool = field(default_factory=lambda: _bool("LLM_CACHE_ENABLED", True))
     # Free tier: ~8,000 tokens per minute. We stay under 90% of it.
     llm_tokens_per_minute: int = field(default_factory=lambda: int(os.getenv("LLM_TOKENS_PER_MINUTE", "8000")))
 
@@ -47,15 +49,15 @@ class Settings:
 
     # --- DECISIONS (set from data, see evaluation/tune.py) -----------------
     # Chunking: "whole" = one passage per article, "section" = split on ## headings.
-    chunk_strategy: str = field(default_factory=lambda: os.getenv("CHUNK_STRATEGY", "section"))
+    chunk_strategy: str = field(default_factory=lambda: os.getenv("CHUNK_STRATEGY", "whole"))
     retrieval_top_k: int = field(default_factory=lambda: int(os.getenv("RETRIEVAL_TOP_K", "3")))
     # Passages scoring below this similarity are treated as "no relevant doc".
-    relevance_threshold: float = field(default_factory=lambda: float(os.getenv("RELEVANCE_THRESHOLD", "0.35")))
+    relevance_threshold: float = field(default_factory=lambda: float(os.getenv("RELEVANCE_THRESHOLD", "0.40")))
     # Intent confidence below this always escalates.
     confidence_threshold: float = field(default_factory=lambda: float(os.getenv("CONFIDENCE_THRESHOLD", "0.50")))
     # Probability (from the answerability classifier) that the docs can solve THIS
     # specific ticket. Below this, escalate even if a related article was found.
-    answerable_threshold: float = field(default_factory=lambda: float(os.getenv("ANSWERABLE_THRESHOLD", "0.50")))
+    answerable_threshold: float = field(default_factory=lambda: float(os.getenv("ANSWERABLE_THRESHOLD", "0.60")))
     # Share of an answer's words that must appear in the cited passages.
     grounding_min_overlap: float = field(default_factory=lambda: float(os.getenv("GROUNDING_MIN_OVERLAP", "0.5")))
 
