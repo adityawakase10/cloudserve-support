@@ -1,9 +1,9 @@
 {
   "meta": {
-    "run_id": "run-20261114T135252Z",
+    "run_id": "run-20261115T080700Z",
     "input": "data/demo_failure_tickets.json",
-    "started": "2026-11-14T13:52:52.355318+00:00",
-    "duration_s": 48.0,
+    "started": "2026-11-15T08:07:00.153112+00:00",
+    "duration_s": 96.1,
     "model": "openai/gpt-oss-20b",
     "settings": {
       "embedding_backend": "sentence-transformers",
@@ -38,14 +38,14 @@
         "median": null
       },
       "time_to_handoff_all_s": {
-        "mean": 0.17,
-        "median": 0.12
+        "mean": 0.32,
+        "median": 0.18
       }
     },
     "technical": {
       "latency_s": {
-        "median": 0.119,
-        "p95": 0.434
+        "median": 0.179,
+        "p95": 1.183
       },
       "tokens_used_total": 0
     },
